@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>浪人シミュレーター — WASEDA RUN</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+button{font:inherit;cursor:pointer;border:0}.app{max-width:1100px;margin:auto;padding:12px}
+header{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:9px}
+h1{font-size:18px;margin:0}.sub{color:#8b949e;font-size:10px}.top{display:flex;gap:5px}
+.btn{background:#21262d;color:#fff;border:1px solid #30363d;border-radius:7px;padding:6px 8px;font-size:11px}.btn:hover{background:#30363d}
+.hero{background:linear-gradient(135deg,#172033,#111827);border:1px solid #26344b;border-radius:12px;padding:10px 12px;margin-bottom:9px}
+.hero h2{margin:0 0 2px;font-size:21px}.hero p{margin:0;color:#9da9ba;font-size:11px}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:9px}.card{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:10px}
+.card h3{margin:0 0 8px;font-size:13px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.stat{background:#0d1117;border:1px solid #21262d;border-radius:7px;padding:6px}.stat b{display:block;font-size:15px}.stat span{font-size:9px;color:#8b949e}
+.bar{height:4px;background:#21262d;border-radius:4px;overflow:hidden;margin-top:4px}.fill{height:100%;background:#58a6ff}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.action{background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:7px;padding:8px 5px;text-align:left;min-height:48px}.action:hover{border-color:#58a6ff;transform:translateY(-1px)}.action strong{display:block;font-size:11px;white-space:nowrap}.action small{color:#8b949e;font-size:8px}
+.tabs{display:flex;gap:4px;margin-bottom:7px;overflow:auto}.tab{padding:6px 9px;border-radius:7px;background:#21262d;color:#aaa;white-space:nowrap;font-size:11px}.tab.on{background:#1f6feb;color:white}
+.log{height:220px;overflow:auto;display:flex;flex-direction:column;gap:5px}.event{padding:7px;border-radius:7px;background:#0d1117;border-left:3px solid #30363d;font-size:11px}.event.good{border-left-color:#3fb950}.event.bad{border-left-color:#f85149}.event.special{border-left-color:#a371f7}
+.people{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}.person{padding:8px;background:#0d1117;border-radius:7px;border:1px solid #21262d}.person .name{font-weight:700;font-size:11px}.heart{color:#ff6b9a}.muted{color:#8b949e;font-size:9px}.relrow{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}.relbtn{background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:4px 6px;font-size:9px}.relbtn:disabled{opacity:.35}.meter{display:grid;grid-template-columns:42px 1fr 24px;gap:4px;align-items:center;font-size:8px;color:#8b949e;margin-top:3px}.meter .bar{margin:0;height:3px}.relation{font-size:9px;color:#79c0ff;margin-top:3px}.relmodal{max-height:78vh;overflow:auto}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:12px;z-index:5}.modal.show{display:flex}.modalbox{max-width:560px;width:100%;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px}.choices{display:grid;gap:6px;margin-top:10px}.choice{padding:10px;background:#21262d;color:white;border-radius:7px;text-align:left;font-size:12px}.choice:hover{background:#30363d}
+.progress{font-size:10px;color:#8b949e;margin-top:5px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.day{min-height:38px;background:#0d1117;border-radius:5px;padding:4px;font-size:8px;color:#8b949e}.day.today{outline:2px solid #58a6ff;color:#fff}.day.exam{background:#351b1b;color:#ff7b72}
+@media(max-width:760px){
+  .app{padding:7px}
+  header{margin-bottom:6px}
+  h1{font-size:15px}.sub{font-size:8px}
+  .top{gap:3px}.btn{padding:5px 6px;font-size:9px}
+  .hero{padding:8px 10px;margin-bottom:6px;border-radius:9px}
+  .hero h2{font-size:18px}.hero p{font-size:9px}
+  .grid{grid-template-columns:1fr;gap:6px}
+  .card{padding:7px;border-radius:9px}
+  .card h3{font-size:11px;margin-bottom:5px}
+  .stats{grid-template-columns:repeat(4,1fr);gap:3px}
+  .stat{padding:5px;border-radius:5px}.stat b{font-size:13px}.stat span{font-size:7px}
+  .actions{grid-template-columns:repeat(4,1fr);gap:3px}
+  .action{padding:6px 3px;min-height:43px;border-radius:6px}
+  .action strong{font-size:9px}.action small{font-size:6px}
+  .tabs{margin-bottom:5px}.tab{padding:5px 7px;font-size:9px}
+  .log{height:170px;gap:3px}.event{padding:5px;font-size:9px}
+  .people{grid-template-columns:repeat(2,1fr);gap:3px}.person{padding:5px}.person .name{font-size:9px}.muted{font-size:7px}
+  aside{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+  aside .card,aside .card[style]{margin-top:0!important}
+  aside .card h3{font-size:9px}
+  aside .card>div[style]{font-size:18px!important}
+  .modalbox{padding:11px}.choice{padding:8px;font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><h1>浪人シミュレーター <span class="sub">WASEDA RUN</span></h1><div class="sub">2026年度 — 早稲田合格を目指せ</div></div>
+<div class="top"><button class="btn" onclick="saveGame()">保存</button><button class="btn" onclick="loadGame()">読込</button><button class="btn" onclick="resetGame()">最初から</button></div></header>
+
+<section class="hero"><h2 id="date">4月1日（水）</h2><p id="phase">浪人生活、開始。</p><div class="progress" id="days"></div></section>
+
+<div class="grid">
+<main>
+<div class="card">
+<div class="tabs"><button class="tab on" onclick="showTab('status',this)">ステータス</button><button class="tab" onclick="showTab('people',this)">人間関係</button><button class="tab" onclick="showTab('calendar',this)">年間予定</button></div>
+<div id="status">
+<div class="stats" id="stats"></div>
+<h3 style="margin-top:16px">今日の行動</h3><div class="actions" id="actions"></div>
+</div>
+<div id="people" style="display:none"><div class="muted" style="margin-bottom:7px">行動すると好感・信頼・親密度が変化。関係が進むと固有イベントが解禁。</div><div class="people" id="peopleList"></div></div>
+<div id="calendar" style="display:none"><div class="calendar" id="calendarGrid"></div></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>生活ログ</h3><div class="log" id="log"></div></div>
+</main>
+
+<aside>
+<div class="card"><h3>受験状況</h3><div id="exam"></div></div>
+<div class="card" style="margin-top:14px"><h3>現在の所持金</h3><div style="font-size:26px;font-weight:700" id="money"></div><div class="muted">バイト・出費・イベントで変動</div></div>
+<div class="card" style="margin-top:14px"><h3>今日の目標</h3><div id="goal"></div></div>
+</aside>
+</div>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox"><h2 id="modalTitle"></h2><p id="modalText"></p><div class="choices" id="choices"></div></div></div>
+
+<script>
+const initial={
+day:0, money:80000, energy:80, mental:75, health:80,
+eng:48,jpn:42,world:50,writing:40,
+study:0, streak:0, totalStudy:0, saved:false,
+people:{
+ rinka:{name:"りんか",type:"恋人",aff:62,trust:55,close:58,mood:72,state:"恋人",last:-7},
+ mokujyo:{name:"もくじょ",type:"友達",aff:60,trust:70,close:52,mood:68,state:"友達",last:-4},
+ tetsu:{name:"てつ",type:"ライバル",aff:50,trust:50,close:35,mood:55,state:"ライバル",last:-3},
+ keio:{name:"予備校の女子",type:"クラスメイト",aff:35,trust:35,close:28,mood:62,state:"クラスメイト",last:-12}
+},
+logs:[{t:"4月1日",x:"今日から浪人生活が始まった。第一志望は早稲田。",c:"special"}]
+};
+let g=JSON.parse(JSON.stringify(initial));
+const dow=["水","木","金","土","日","月","火"];
+const months=[30,31,30,31,31,30,31,30,31,30,31,31];
+
+function $(id){return document.getElementById(id)}
+function dateObj(){let d=new Date(2026,3,1);d.setDate(d.getDate()+g.day);return d}
+function dateStr(){let d=dateObj();return `${d.getMonth()+1}月${d.getDate()}日（${dow[g.day%7]}）`}
+function clamp(n,a=0,b=100){return Math.max(a,Math.min(b,n))}
+function addLog(x,c=""){g.logs.unshift({t:dateStr(),x,c}); if(g.logs.length>80)g.logs.pop()}
+function stat(label,val,desc){return `<div class="stat"><span>${label}</span><b>${Math.round(val)}</b><div class="bar"><div class="fill" style="width:${clamp(val)}%"></div></div><span>${desc}</span></div>`}
+
+function render(){
+$("date").textContent=dateStr();
+let p=g.day<30?"基礎固め":g.day<120?"夏までの伸長期":g.day<210?"秋の実戦期":g.day<285?"冬の完成期":"入試本番";
+$("phase").textContent=p;
+$("days").textContent=`本番まで ${365-g.day} 日 / 勉強 ${Math.floor(g.totalStudy)} 時間`;
+$("stats").innerHTML=
+stat("英語",g.eng,"長文・文法・語彙")+stat("国語",g.jpn,"現代文・古文・漢文")+
+stat("世界史",g.world,"通史・論述")+stat("記述力",g.writing,"答案作成")+
+stat("体力",g.health,"生活習慣")+stat("メンタル",g.mental,"継続力")+
+stat("集中力",g.energy,"今日の行動力")+stat("勉強習慣",clamp(g.streak*4),"継続日数");
+$("money").textContent=`¥${g.money.toLocaleString()}`;
+$("actions").innerHTML=`
+<button class="action" onclick="study('eng')"><strong>📘 英語を勉強</strong><small>+英語 / 疲労</small></button>
+<button class="action" onclick="study('jpn')"><strong>📕 国語を勉強</strong><small>+国語 / 疲労</small></button>
+<button class="action" onclick="study('world')"><strong>📗 世界史を勉強</strong><small>+世界史 / 疲労</small></button>
+<button class="action" onclick="study('all')"><strong>📚 3科目演習</strong><small>総合力 / 大疲労</small></button>
+<button class="action" onclick="social()"><strong>💬 人と会う</strong><small>好感度 / メンタル</small></button>
+<button class="action" onclick="rest()"><strong>🛌 休む</strong><small>体力 / メンタル</small></button>
+<button class="action" onclick="partTime()"><strong>💴 バイト</strong><small>お金 / 時間</small></button>
+<button class="action" onclick="simulateDay()"><strong>⏩ 1日進める</strong><small>何もしない</small></button>`;
+$("exam").innerHTML=examText();
+$("goal").innerHTML=goalText();
+$("peopleList").innerHTML=Object.entries(g.people).map(([k,p])=>{
+ let cooldown=Math.max(0,3-(g.day-p.last));
+ return `<div class="person"><div class="name">${p.name} <span class="heart">♥</span> ${p.aff}</div><div class="relation">${relationLabel(p)}</div>
+ <div class="meter"><span>好感</span><div class="bar"><div class="fill" style="width:${p.aff}%"></div></div><b>${p.aff}</b></div>
+ <div class="meter"><span>信頼</span><div class="bar"><div class="fill" style="width:${p.trust}%"></div></div><b>${p.trust}</b></div>
+ <div class="meter"><span>親密</span><div class="bar"><div class="fill" style="width:${p.close}%"></div></div><b>${p.close}</b></div>
+ <div class="muted">機嫌 ${p.mood} / ${p.type}</div>
+ <div class="relrow"><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','line')">💬 LINE</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','study')">📚 勉強</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','meet')">☕ 会う</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','talk')">🗣 相談</button></div>
+ </div>`
+}).join("");
+$("calendarGrid").innerHTML=Array.from({length:365},(_,i)=>`<div class="day ${i===g.day?"today":""} ${[305,315,325,335].includes(i)?"exam":""}">${i+1}<br>${i===305?"共テ":i===335?"早稲田":" "}</div>`).join("");
+$("log").innerHTML=g.logs.map(l=>`<div class="event ${l.c}"><span class="muted">${l.t}</span><br>${l.x}</div>`).join("");
+}
+function examText(){
+let avg=(g.eng+g.jpn+g.world+g.writing)/4;
+let grade=avg>=78?"A":avg>=68?"B":avg>=58?"C":avg>=48?"D":"E";
+return `<div style="font-size:42px;font-weight:800">${grade}判定</div><p>総合力 ${avg.toFixed(1)}</p>
+<div class="muted">早稲田 商学部 / 文化構想</div><div class="progress">本番想定：${g.day<250?"まだ伸ばせる":"実戦力が重要な時期"}</div>`;
+}
+function goalText(){
+let d=dateObj();let goals=g.day<90?["英単語を固める","世界史通史を一周","古文単語を継続"]:g.day<210?["早稲田レベル演習","過去問研究","弱点補強"]:["過去問演習","答案の精度","睡眠と体調管理"];
+return `<b>${goals[g.day%goals.length]}</b><p class="muted">行動によってステータスと人間関係が変化します。</p>`;
+}
+function showTab(id,b){["status","people","calendar"].forEach(x=>$(x).style.display=x===id?"block":"none");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));b.classList.add("on")}
+
+function study(type){
+if(g.energy<18){addLog("今日はもう集中力が残っていない。休むべきだ。","bad");render();return}
+let gain= type==="all"?2.2:4.2;
+let cost=type==="all"?28:17;
+if(type==="all"){g.eng+=gain;g.jpn+=gain;g.world+=gain;g.writing+=1.2}
+else g[type]+=gain;
+g[type==="all"?"eng":type]=type==="all"?g.eng:clamp(g[type]);
+g.energy-=cost;g.health-=type==="all"?4:2;g.totalStudy+=type==="all"?5:2.5;g.streak++;
+addLog(type==="all"?"3科目の実戦演習をやり切った。":`${{eng:"英語",jpn:"国語",world:"世界史"}[type]}を集中して勉強した。`,"good");
+randomEvent();advance();
+}
+function rest(){g.energy=95;g.health=clamp(g.health+9);g.mental=clamp(g.mental+8);g.streak=0;addLog("今日は休養日。明日に備えて回復した。");advance()}
+function social(){
+ let keys=Object.keys(g.people);let k=keys[Math.floor(Math.random()*keys.length)];relAction(k,'meet',true)
+}
+function relationLabel(p){
+ if(p.state==='恋人' && p.close>=80) return '💗 深い恋人関係';
+ if(p.aff>=80 && p.trust>=70) return p.state==='恋人'?'💗 恋人':'✨ 特別な存在';
+ if(p.aff>=65 && p.trust>=55) return '💛 親しい';
+ if(p.aff>=50 && p.trust>=45) return '🙂 仲がいい';
+ if(p.trust>=65) return '🤝 信頼できる友人';
+ return p.state;
+}
+function relAction(k,action,fromSocial=false){
+ let p=g.people[k];
+ if(!fromSocial && g.day-p.last<3){addLog(`${p.name}とは少し間を空けた方がよさそうだ。`,'bad');render();return}
+ if(g.energy<8){addLog('今日はもう人と関わる余力がない。','bad');render();return}
+ let effects={line:[3,2,4,1],study:[4,5,6,0],meet:[7,4,10,5],talk:[4,9,7,2]}[action];
+ let names={line:'LINE',study:'一緒に勉強',meet:'二人で会う',talk:'悩み相談'};
+ let [a,t,c,m]=effects;
+ if(k==='tetsu' && action==='study'){a=2;t=1;c=1;m=3}
+ if(k==='keio' && action==='meet'){a+=2;c+=2}
+ p.aff=clamp(p.aff+a);p.trust=clamp(p.trust+t);p.close=clamp(p.close+c);p.mood=clamp(p.mood+m);p.last=g.day;
+ g.energy-=action==='meet'?20:action==='study'?14:10;g.mental=clamp(g.mental+(action==='talk'?7:action==='meet'?5:2));
+ updateRelationship(k);
+ let text=relationshipText(k,action);
+ addLog(text, action==='talk'||p.state==='恋人'?'special':'good');
+ if(relationshipUnlock(k)) return;
+ advance();
+}
+function updateRelationship(k){
+ let p=g.people[k];
+ if(k==='rinka' && p.aff>=70 && p.trust>=65){p.state='恋人';p.type='恋人'}
+ else if(k==='keio' && p.aff>=70 && p.trust>=60){p.state='好意'}
+ else if(p.aff>=75 && p.trust>=65)p.state='親友';
+ else if(p.aff>=60 && p.trust>=50)p.state='親しい';
+ else if(p.aff>=50 || p.trust>=50)p.state='仲がいい';
+}
+function relationshipUnlock(k){
+ let p=g.people[k];
+ if(k==='rinka' && p.aff>=82 && p.trust>=75 && p.close>=80 && p.state==='恋人' && !p.deep){
+  p.deep=true;
+  openModal('りんかとの特別イベント',`${p.name}「受験も大事だけど、無理しすぎないでね。今日は少しだけ一緒にいたい」`,[
+   {t:'一緒にゆっくり過ごす',f:()=>{p.close=clamp(p.close+6);p.trust=clamp(p.trust+4);addLog('りんかとの距離が一段と近づいた。','special');advance()}},
+   {t:'勉強を優先する',f:()=>{p.trust=clamp(p.trust+3);g.mental=clamp(g.mental+2);addLog('りんかは少し寂しそうだったが、応援してくれた。','special');advance()}}
+  ]);return true;
+ }
+ if(k==='keio' && p.aff>=78 && p.trust>=65 && p.close>=65 && !p.special){
+  p.special=true;openModal('クラスメイトとの分岐',`${p.name}「最近、話してるとなんか落ち着くんだよね」`,[
+   {t:'素直に嬉しいと伝える',f:()=>{p.aff=clamp(p.aff+5);p.close=clamp(p.close+5);addLog('クラスメイトとの関係が特別な段階に進んだ。','special');advance()}},
+   {t:'受験を優先すると伝える',f:()=>{p.trust=clamp(p.trust+5);addLog('距離感を保ちながら、お互い受験を頑張ることにした。','good');advance()}}
+  ]);return true;
+ }
+ return false;
+}
+function relationshipText(k,a){
+ let p=g.people[k];
+ let base={line:'連絡を取った。',study:'一緒に勉強した。',meet:'二人で会った。',talk:'悩みを聞いた。'}[a];
+ if(k==='tetsu') base=a==='study'?'てつと模試や勉強量について話した。':'てつと話した。良い刺激になった。';
+ if(k==='rinka' && a==='line') base='りんかとLINEした。受験のことや日常の話で少し距離が縮まった。';
+ if(k==='mokujyo' && a==='talk') base='もくじょに弱音を話した。気持ちが少し軽くなった。';
+ return `${p.name}と${base}`;
+}
+function partTime(){g.money+=6500;g.energy-=35;g.mental=clamp(g.mental-2);g.totalStudy+=0;addLog("バイトで¥6,500稼いだ。勉強時間は削られた。");advance()}
+function simulateDay(){g.energy=clamp(g.energy+15);g.health=clamp(g.health-1);g.mental=clamp(g.mental-1);addLog("特別な行動をせず1日を終えた。");randomEvent();advance()}
+function advance(){
+Object.values(g.people).forEach(p=>{p.mood=clamp(p.mood+(Math.random()<.5?-2:2));});
+g.day++;
+if(g.day>=365){finish();return}
+if(g.day%7===0){g.money-=3500;addLog("週の生活費として¥3,500使った。");}
+if(g.day%30===0){g.eng+=1;g.jpn+=1;g.world+=1;addLog("1か月の継続効果で基礎力が少し伸びた。","good")}
+render()
+}
+function randomEvent(){
+let r=Math.random();
+if(r<.10){g.people.tetsu.aff=clamp(g.people.tetsu.aff+3);addLog("てつが模試の結果を見せてきた。負けたくない。","special")}
+else if(r<.18){g.mental=clamp(g.mental-7);addLog("SNSを見すぎて時間を失った。メンタルも少し下がった。","bad")}
+else if(r<.24){g.eng+=2;addLog("予備校の先生から英語の勉強法を教わった。","good")}
+else if(r<.29){g.money-=2500;addLog("参考書を購入した。¥2,500。")}
+else if(r<.33){g.people.rinka.aff=clamp(g.people.rinka.aff+8);addLog("りんかから嬉しい連絡が来た。","special")}
+}
+function finish(){
+let avg=(g.eng+g.jpn+g.world+g.writing)/4;
+let pass=avg>=73 && g.mental>=35;
+openModal("1年間の浪人生活、終了",pass?`早稲田に合格した。総合力 ${avg.toFixed(1)}。この1年の積み重ねが結果になった。`:`早稲田は不合格だった。総合力 ${avg.toFixed(1)}。ただし、この1年で積み上げたものは残っている。`,[{t:"もう一度プレイ",f:()=>resetGame()}])
+}
+function openModal(title,text,opts){$("modalTitle").textContent=title;$("modalText").textContent=text;$("choices").innerHTML=opts.map((o,i)=>`<button class="choice" id="c${i}">${o.t}</button>`).join("");opts.forEach((o,i)=>$("c"+i).onclick=()=>{closeModal();o.f()});$("modal").classList.add("show")}
+function closeModal(){$("modal").classList.remove("show")}
+function saveGame(){localStorage.setItem("wasedaRun",JSON.stringify(g));addLog("ゲームを保存した。","good");render()}
+function loadGame(){let x=localStorage.getItem("wasedaRun");if(x){g=JSON.parse(x);addLog("保存データを読み込んだ。","good");render()}else{addLog("保存データがありません。","bad");render()}}
+function resetGame(){if(confirm("最初からやり直しますか？")){g=JSON.parse(JSON.stringify(initial));render()}}
+render();
+</script>
+</body>
+</html>
