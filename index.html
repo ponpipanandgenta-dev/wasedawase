@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>浪人シミュレーター — WASEDA RUN</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#070b12;--panel:#0d1623;--line:#263b55;--blue:#59b8ff;--pink:#ff6da9;--purple:#a87cff;--text:#eef5ff;--muted:#8195aa}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 20% 0%,#16263a 0,#080d15 42%,#05070c 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+button{font:inherit;cursor:pointer}.app{max-width:1500px;margin:auto;padding:14px}
+header{display:grid;grid-template-columns:1.2fr .9fr 1.5fr;gap:14px;align-items:center;margin-bottom:10px}
+h1{margin:0;font-size:20px}.sub{color:#8fa2b7;font-size:10px}.brand{display:flex;gap:10px;align-items:center}.brandMark{font-size:34px;color:var(--pink)}
+.top{display:flex;gap:5px;justify-content:flex-end}.btn{background:#132235;color:#eaf4ff;border:1px solid #304762;border-radius:8px;padding:7px 10px;font-size:11px}
+.hero{display:grid;grid-template-columns:1fr auto;gap:15px;min-height:125px;padding:13px 15px;border:1px solid #29405b;border-radius:12px;background:linear-gradient(120deg,#101c2c,#111827 55%,#1a1220);box-shadow:0 14px 40px #0007;margin-bottom:10px}
+.hero-main{display:flex;gap:14px;align-items:center}.hero-avatar{width:90px;height:104px;position:relative;overflow:hidden;border-radius:12px;border:1px solid #456481;background:radial-gradient(circle at 50% 18%,#28415b 0,#16283b 42%,#0a1019 100%);box-shadow:inset 0 -18px 30px #0005}.char-art{position:absolute;inset:0}.external-avatar{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 7px 10px #0008)}
+.hero-avatar .external-avatar{padding:3px 5px 0}
+.npc-face .external-avatar{padding:1px 2px 0}
+.person-portrait .external-avatar{padding:1px 2px 0}
+.char-art .hair{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:54px;height:52px;background:#26384b;border-radius:55% 55% 42% 48%;z-index:3}.char-art .face{position:absolute;left:50%;top:27px;transform:translateX(-50%);width:43px;height:48px;background:#e9b59a;border-radius:45% 45% 48% 48%;z-index:2}.char-art .face:before{content:"";position:absolute;left:8px;top:20px;width:5px;height:3px;border-radius:50%;background:#243040;box-shadow:22px 0 #243040}.char-art .face:after{content:"";position:absolute;left:18px;top:30px;width:8px;height:4px;border-bottom:2px solid #9d5e62;border-radius:50%}.char-art .body{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);width:65px;height:52px;background:#284765;border-radius:28px 28px 0 0;z-index:1}.hero-avatar .hair{width:62px;height:55px}.hero-avatar .face{width:48px;height:53px}.hero-avatar .body{width:72px;height:56px}.char-art.male .hair{border-radius:48% 58% 34% 42%}.char-art.female .hair{width:59px;height:63px;border-radius:52% 52% 40% 45%;box-shadow:0 12px 0 -3px #26384b}.char-art.rinka .hair{background:#432f45}.char-art.rinka .body{background:#8d4d70}.char-art.mokujyo .hair{background:#17202b}.char-art.mokujyo .body{background:#3c5871}.char-art.tetsu .hair{background:#5b392d}.char-art.tetsu .body{background:#31475c}.char-art.ryuto .hair{background:#242b35}.char-art.ryuto .body{background:#4b5664}.char-art.yuta .hair{background:#49382b}.char-art.yuta .body{background:#345d66}.char-art.yugo .hair{background:#172c42}.char-art.yugo .body{background:#415c82}.char-art.daisuke .hair{background:#30343b}.char-art.daisuke .body{background:#53606d}.char-art.rasuro .hair{background:#6b4a2f}.char-art.rasuro .body{background:#67503c}.char-art.takeshi .hair{background:#1d252e}.char-art.takeshi .body{background:#2f5260}.char-art.rise .hair{background:#5b354f}.char-art.rise .body{background:#a34f79}.char-art.yuuri .hair{background:#3e2d27}.char-art.yuuri .body{background:#6b4f83}.char-art.mihana .hair{background:#704f3d}.char-art.mihana .body{background:#b06c6c}.char-art.mimoe .hair{background:#332d42}.char-art.mimoe .body{background:#5964a0}.char-art.kurumi .hair{background:#5b4632}.char-art.kurumi .body{background:#607a62}.npc-face{width:48px;height:54px;border-radius:9px;background:#0d1826;border:1px solid #47647e;flex:none;position:relative;overflow:hidden}.npc-face .char-art .hair{width:31px;height:30px;top:5px}.npc-face .char-art .face{width:25px;height:29px;top:17px}.npc-face .char-art .face:before{left:5px;top:12px;width:3px;height:2px;box-shadow:12px 0 #243040}.npc-face .char-art .face:after{left:11px;top:19px;width:5px;height:3px}.npc-face .char-art .body{width:38px;height:27px;bottom:-8px}.npc-mini{padding:7px 4px}.npc-mini:hover{background:#102136}.npc-mini b{font-size:10px}.npc-mini small{font-size:8px}.person-head{display:flex;gap:9px;align-items:center;margin-bottom:7px}.person-portrait{width:58px;height:64px;border-radius:10px;overflow:hidden;background:#0d1826;border:1px solid #334d68;position:relative;flex:none}.person-portrait .char-art .hair{width:40px;height:39px;top:5px}.person-portrait .char-art .face{width:32px;height:36px;top:21px}.person-portrait .char-art .face:before{left:6px;top:15px;width:4px;height:2px;box-shadow:16px 0 #243040}.person-portrait .char-art .face:after{left:14px;top:24px;width:6px;height:3px}.person-portrait .char-art .body{width:47px;height:34px;bottom:-9px}
+.eyebrow{font-size:9px;color:var(--blue);letter-spacing:.16em}.hero h2{margin:3px 0;font-size:22px}.hero p{margin:0;color:#9eb0c2;font-size:11px}.progress{font-size:10px;color:#8499ad;margin-top:8px}.hero-quote{margin-top:8px;font-weight:700;font-size:14px}
+.hero-kpis{display:flex;gap:7px;align-items:center}.hero-kpis>div{min-width:86px;padding:8px 10px;border:1px solid #30465e;background:#0b1522cc;border-radius:9px}.hero-kpis span{display:block;color:#8ea1b5;font-size:9px}.hero-kpis b{display:block;margin-top:2px;font-size:15px;color:#ffd36a}
+.tabs{display:flex;gap:6px;margin-bottom:10px;overflow:auto}.tab{padding:7px 10px;border-radius:8px;background:#142337;color:#91a5ba;border:1px solid #263b54;white-space:nowrap;font-size:10px}.tab.on{background:#236ea8;color:#fff;border-color:#59b8ff}
+.dashboard{display:grid;grid-template-columns:300px minmax(430px,1fr) 330px;gap:10px}.card{background:linear-gradient(145deg,#0d1827ee,#09121de8);border:1px solid #2a4059;border-radius:10px;padding:11px;box-shadow:0 12px 30px #0005}.left .card,.right .card{margin-bottom:10px}
+.card h3{margin:0 0 8px;font-size:13px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.stat{background:#0a1320;border:1px solid #203249;border-radius:8px;padding:8px}.stat b{display:block;font-size:17px}.stat span{font-size:9px;color:#91a5b8}.bar{height:5px;background:#1a2939;border-radius:5px;overflow:hidden;margin-top:5px}.fill{height:100%;background:linear-gradient(90deg,#2f8fe2,#68c8ff)}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.action{background:#122237;color:#eef5ff;border:1px solid #29435e;border-radius:8px;padding:9px 7px;text-align:left;min-height:52px}.action:hover{border-color:var(--blue);transform:translateY(-1px)}.action strong{display:block;font-size:11px}.action small{color:#8095a9;font-size:8px}.action.skip{border-color:#354b62;background:#101b28}
+.log{height:260px;overflow:auto;display:flex;flex-direction:column;gap:5px}.event{padding:8px;border-radius:7px;background:#0a121d;border-left:3px solid #304154;font-size:10px}.event.good{border-left-color:#36c98b}.event.bad{border-left-color:#f15d70}.event.special{border-left-color:#a371f7}
+.people{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.person{padding:9px;background:#0a1320;border:1px solid #21364d;border-radius:9px}.person .name{font-weight:700;font-size:11px}.heart{color:var(--pink)}.muted{color:#8296aa;font-size:9px}.relrow{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.relbtn{background:#15253a;color:#dce9f7;border:1px solid #2b435c;border-radius:6px;padding:5px 6px;font-size:8px}.meter{display:grid;grid-template-columns:38px 1fr 22px;gap:4px;align-items:center;margin-top:4px;font-size:8px}
+.mapgrid,.calendar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.monthCard,.loc{background:#0a1320;border:1px solid #20354b;border-radius:8px;padding:8px}.monthCard.active{border-color:#59b8ff}.monthCard b,.monthCard span,.monthCard small{display:block}.monthCard span,.monthCard small{font-size:8px;color:#8296aa}.eventcard{margin-top:7px;padding:9px;background:#0a1320;border:1px solid #20354b;border-radius:8px;font-size:10px}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:99}.modal.show{display:flex}.modalbox{max-width:650px;width:100%;max-height:85vh;overflow:auto;background:#101b2a;border:1px solid #35516d;border-radius:14px;padding:18px}.choices{display:grid;gap:7px;margin-top:15px}.choice{padding:11px;background:#18293d;color:white;border:1px solid #304964;border-radius:8px;text-align:left}
+.npc-mini{width:100%;display:flex;gap:7px;align-items:center;padding:6px;background:transparent;color:#fff;border:0;border-bottom:1px solid #ffffff0b;text-align:left}.npc-face{width:38px;height:44px;border-radius:8px;background:linear-gradient(145deg,#304d69,#17283b);border:1px solid #47647e;flex:none}
+@media(max-width:1150px){header{grid-template-columns:1fr 1fr}.hero-kpis{grid-column:1/-1;justify-content:flex-start}.dashboard{grid-template-columns:270px 1fr}.right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.app{padding:7px}header{grid-template-columns:1fr}.top{justify-content:flex-start}.hero{grid-template-columns:1fr;padding:9px}.hero-avatar{width:65px;height:78px}.hero-kpis{overflow:auto}.hero-kpis>div{min-width:78px}.dashboard{display:block}.left{display:none}.right{display:block}.right .card{margin-top:8px}.tabs{display:grid;grid-template-columns:repeat(3,1fr)}.tab{padding:6px 4px}.stats,.people,.actions{grid-template-columns:repeat(2,1fr)}.log{height:190px}.mapgrid,.calendar{grid-template-columns:repeat(2,1fr)}.summary{grid-template-columns:repeat(2,1fr)}h1{font-size:16px}.hero h2{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="brandMark">✿</div><div><h1>浪人シミュレーター <span class="sub">— WASEDA RUN</span></h1><div class="sub">もう一度、あのキャンパスへ。 ・ 2026年度</div></div></div>
+  <div><b id="topDate">2026年 4月 1日（水）</b><div class="sub">浪人生活 / 早稲田合格まで</div></div>
+  <div class="top"><button class="btn" onclick="saveGame()">保存</button><button class="btn" onclick="loadGame()">読込</button><button class="btn" onclick="resetGame()">最初から</button></div>
+</header>
+<section class="hero">
+  <div class="hero-main"><div class="hero-avatar" id="heroAvatar"><img class="external-avatar" src="https://api.dicebear.com/10.x/open-peeps/svg?seed=waseda-student&backgroundColor=0b1626" alt="主人公"></div><div><div class="eyebrow">WASEDA RUN / RONIN LIFE</div><h2 id="date">4月1日（水）</h2><p id="phase">浪人生活、開始。</p><div class="progress" id="days"></div><div class="hero-quote">今年こそ、絶対に早稲田へ。</div></div></div>
+  <div class="hero-kpis"><div><span>英語</span><b id="heroEng">48</b></div><div><span>世界史</span><b id="heroWorld">50</b></div><div><span>メンタル</span><b id="heroMental">75</b></div><div><span>所持金</span><b id="heroMoney">¥80,000</b></div></div>
+</section>
+<nav class="tabs">
+<button class="tab on" onclick="showTab('status',this)">🏠 ホーム</button><button class="tab" onclick="showTab('status',this)">📚 勉強</button><button class="tab" onclick="showTab('status',this)">📖 参考書</button><button class="tab" onclick="showTab('people',this)">👥 人間関係</button><button class="tab" onclick="openRelationshipGraph()">💞 相関図</button><button class="tab" onclick="showTab('world',this)">💬 SNS</button><button class="tab" onclick="showTab('calendar',this)">📊 模試・受験</button><button class="tab" onclick="showTab('calendar',this)">🎓 大学生活</button><button class="tab" onclick="showTab('history',this)">📕 図鑑・記録</button>
+</nav>
+<div class="dashboard">
+<aside class="left">
+<div class="card"><h3>あなた</h3><div style="height:135px;border-radius:10px;background:linear-gradient(145deg,#16283c,#0b121d);position:relative;overflow:hidden;margin-bottom:8px"><div class="hero-avatar" style="position:absolute;left:calc(50% - 45px);top:12px"><img class="external-avatar" src="https://api.dicebear.com/10.x/open-peeps/svg?seed=waseda-student&backgroundColor=0b1626" alt="主人公"></div><div style="position:absolute;bottom:7px;left:10px;font-size:12px;font-weight:700">やる。今しかない。</div></div><button class="btn" onclick="showTab('status',document.querySelector('.tab'))">プロフィール</button></div>
+<div class="card"><h3>ステータス</h3><div class="stats" id="stats"></div></div>
+<div class="card"><h3>今週の予定</h3><div class="muted" style="line-height:2">6/15　模試（全統記述）<br>6/20　りんかと図書館で勉強<br>6/27　バイト（模試監督）</div></div>
+<div class="card"><h3>登場人物</h3><div id="roster"></div></div>
+</aside>
+<main>
+<div class="card">
+<div id="status"><div style="display:flex;justify-content:space-between;align-items:end"><div><div class="eyebrow">TODAY'S ACTION</div><h3 style="font-size:18px">今日、どう動く？</h3></div><div class="muted">第一志望　<b style="color:#59b8ff">早稲田大学</b></div></div><div class="actions" id="actions"></div></div>
+<div id="people" style="display:none"><div class="eyebrow">RELATIONSHIP</div><h3 style="font-size:18px">人間関係</h3><div class="muted" style="margin-bottom:8px">好感・信頼・親密度で関係が変化。NPC同士の動きや噂も発生する。</div><div class="people" id="peopleList"></div></div>
+<div id="calendar" style="display:none"><div class="eyebrow">SCHEDULE / EXAM</div><h3 style="font-size:18px">年間予定・受験</h3><div class="timeline" id="monthEvents"></div><div style="height:7px"></div><div class="calendar" id="calendarGrid"></div></div>
+<div id="world" style="display:none"><div class="eyebrow">WORLD</div><h3 style="font-size:18px">予備校の日常</h3><div class="mapgrid" id="map"></div><div class="eventcard"><b>噂・人間関係</b><div id="rumors"></div></div><div class="eventcard"><b>約束</b><div id="promises"></div></div><div class="eventcard"><b>世界の裏側</b><div id="deepWorld"></div></div></div>
+<div id="history" style="display:none"><div class="eyebrow">HISTORY</div><h3 style="font-size:18px">この1年の記録</h3><div class="summary" id="summary"></div><div class="eventcard"><b>この1年の出来事</b><div id="milestones"></div></div><div class="eventcard"><b>今回のルート・伏線</b><div id="routeInfo"></div></div></div>
+</div>
+<div class="card" style="margin-top:10px"><h3>生活ログ / 今日の出来事</h3><div class="log" id="log"></div></div>
+</main>
+<aside class="right">
+<div class="card"><h3>受験状況</h3><div id="exam"></div></div>
+<div class="card"><h3>現在の所持金</h3><div style="font-size:26px;font-weight:700" id="money"></div><div class="muted">バイト・出費・イベントで変動</div></div>
+<div class="card"><h3>今日の目標</h3><div id="goal"></div></div>
+<div class="card"><h3>予備校ランキング</h3><div id="ranking"></div></div>
+</aside>
+</div>
+<div class="modal" id="modal"><div class="modalbox"><h2 id="modalTitle"></h2><p id="modalText"></p><div class="choices" id="choices"></div></div></div>
+</div>
+<script>
+const initial={
+day:0, money:80000, energy:80, mental:75, health:80,
+eng:48,jpn:42,world:50,writing:40,
+study:0, streak:0, totalStudy:0, saved:false, unreadLines:0, lineInbox:[], npcScores:{},
+people:{
+ rinka:{name:"りんか",type:"恋愛候補",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ mokujyo:{name:"もくじょ",type:"友達",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ tetsu:{name:"てつ",type:"ライバル",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+
+ ryuto:{name:"りゅうと",type:"友達",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ yuta:{name:"ゆうた",type:"明るい友達",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ yugo:{name:"ゆうご",type:"友達",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ daisuke:{name:"だいすけ",type:"友達",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ rasuro:{name:"ラスロ",type:"イケメン",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ takeshi:{name:"たけし",type:"アホな友達",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ rise:{name:"りせ",type:"恋愛候補",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ yuuri:{name:"ゆうり",type:"恋愛候補",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ mihana:{name:"みはな",type:"恋愛候補",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ mimoe:{name:"みもえ",type:"恋愛候補",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99},
+ kurumi:{name:"くるみ",type:"恋愛候補",aff:0,trust:0,close:0,mood:50,state:"未交流",last:-99}
+},
+logs:[{t:"4月1日",x:"今日から浪人生活が始まった。第一志望は早稲田。",c:"special"}]
+};
+let g=JSON.parse(JSON.stringify(initial));
+const dow=["水","木","金","土","日","月","火"];
+const months=[30,31,30,31,31,30,31,30,31,30,31,31];
+
+function $(id){return document.getElementById(id)}
+function dateObj(){let d=new Date(2026,3,1);d.setDate(d.getDate()+g.day);return d}
+function dateStr(){let d=dateObj();return `${d.getMonth()+1}月${d.getDate()}日（${dow[g.day%7]}）`}
+function clamp(n,a=0,b=100){return Math.max(a,Math.min(b,n))}
+const romanceCandidates=new Set(["rinka","rise","yuuri","mihana","mimoe","kurumi"]);
+function isRomance(k){return romanceCandidates.has(k)}
+function addLog(x,c=""){g.logs.unshift({t:dateStr(),x,c}); if(g.logs.length>80)g.logs.pop()}
+function stat(label,val,desc){return `<div class="stat"><span>${label}</span><b>${Math.round(val)}</b><div class="bar"><div class="fill" style="width:${clamp(val)}%"></div></div><span>${desc}</span></div>`}
+
+function avatarUrl(key){
+ const seeds={
+  player:'waseda-student',rinka:'rinka',mokujyo:'mokujyo',tetsu:'tetsu',ryuto:'ryuto',yuta:'yuta',yugo:'yugo',daisuke:'daisuke',rasuro:'rasuro',takeshi:'takeshi',rise:'rise',yuuri:'yuuri',mihana:'mihana',mimoe:'mimoe',kurumi:'kurumi'
+ };
+ const seed=seeds[key]||key;
+ return `https://api.dicebear.com/10.x/open-peeps/svg?seed=${encodeURIComponent(seed)}&backgroundColor=0b1626`;
+}
+function avatarImg(key,cls='external-avatar'){return `<img class="${cls}" src="${avatarUrl(key)}" alt="キャラクター">`}
+function syncDashboard(){
+ const vals={heroEng:g.eng,heroWorld:g.world,heroMental:g.mental};
+ Object.entries(vals).forEach(([id,v])=>{const e=$(id);if(e)e.textContent=Math.round(v)});
+ const m=$("heroMoney");if(m)m.textContent=`¥${Math.round(g.money).toLocaleString()}`;
+ const d=$("topDate");if(d)d.textContent=dateStr();
+ const r=$("roster");
+ if(r)r.innerHTML=Object.entries(g.people).map(([k,p])=>{const female=['rinka','rise','yuuri','mihana','mimoe','kurumi'].includes(k);return `<button class="npc-mini" onclick="showTab('people',document.querySelectorAll('.tab')[3])"><span class="npc-face">${avatarImg(k)}</span><span><b>${p.name}</b><br><small class="muted">${relationLabel(p)} ・ 好感 ${p.aff}</small></span></button>`}).join("");
+}
+function render(){
+ syncDashboard();
+$("date").textContent=dateStr();
+let p=g.day<30?"基礎固め":g.day<120?"夏までの伸長期":g.day<210?"秋の実戦期":g.day<285?"冬の完成期":"入試本番";
+$("phase").textContent=p;
+$("days").textContent=`本番まで ${365-g.day} 日 / 勉強 ${Math.floor(g.totalStudy)} 時間`;
+$("stats").innerHTML=
+stat("英語",g.eng,"長文・文法・語彙")+stat("国語",g.jpn,"現代文・古文・漢文")+
+stat("世界史",g.world,"通史・論述")+stat("記述力",g.writing,"答案作成")+
+stat("体力",g.health,"生活習慣")+stat("メンタル",g.mental,"継続力")+
+stat("集中力",g.energy,"今日の行動力")+stat("勉強習慣",clamp(g.streak*4),"継続日数");
+$("money").textContent=`¥${g.money.toLocaleString()}`;
+$("actions").innerHTML=`
+<button class="action" onclick="study('eng')"><strong>📘 英語を勉強</strong><small>+英語 / 疲労</small></button>
+<button class="action" onclick="study('jpn')"><strong>📕 国語を勉強</strong><small>+国語 / 疲労</small></button>
+<button class="action" onclick="study('world')"><strong>📗 世界史を勉強</strong><small>+世界史 / 疲労</small></button>
+<button class="action" onclick="study('all')"><strong>📚 3科目演習</strong><small>総合力 / 大疲労</small></button>
+<button class="action" onclick="social()"><strong>💬 人と会う</strong><small>好感度 / メンタル</small></button>
+<button class="action" onclick="rest()"><strong>🛌 休む</strong><small>体力 / メンタル</small></button>
+<button class="action" onclick="partTime()"><strong>💴 バイト</strong><small>お金 / 時間</small></button>
+<button class="action" onclick="simulateDay()"><strong>⏩ 1日進める</strong><small>何もしない</small></button>
+<button class="action skip" onclick="skipDays(3)"><strong>⏭️ 3日進める</strong><small>高速シミュレーション</small></button>
+<button class="action skip" onclick="skipDays(7)"><strong>⏭️ 1週間進める</strong><small>重要イベントで停止</small></button>
+<button class="action skip" onclick="skipDays(30)"><strong>⏭️ 1ヶ月進める</strong><small>月間イベントを確認</small></button>
+<button class="action skip" onclick="skipToMajor()"><strong>🚀 次の大型イベント</strong><small>模試・入試などまで</small></button>`;
+$("exam").innerHTML=examText();
+$("goal").innerHTML=goalText();$("ranking").innerHTML=rankingText();
+$("peopleList").innerHTML=Object.entries(g.people).map(([k,p])=>{
+ let cooldown=Math.max(0,3-(g.day-p.last));
+ const female=['rinka','rise','yuuri','mihana','mimoe','kurumi'].includes(k);
+ return `<div class="person"><div class="person-head"><div class="person-portrait">${avatarImg(k)}</div><div><div class="name">${p.name} <span class="heart">♥</span> ${p.aff}</div><div class="relation">${relationLabel(p)}</div></div></div><div class="relation">${relationLabel(p)}</div>
+ <div class="meter"><span>好感</span><div class="bar"><div class="fill" style="width:${p.aff}%"></div></div><b>${p.aff}</b></div>
+ <div class="meter"><span>信頼</span><div class="bar"><div class="fill" style="width:${p.trust}%"></div></div><b>${p.trust}</b></div>
+ <div class="meter"><span>親密</span><div class="bar"><div class="fill" style="width:${p.close}%"></div></div><b>${p.close}</b></div>
+ <div class="muted">機嫌 ${p.mood} / ${p.type} ${p.handhold?'<span class="pill pink">手をつないだ</span>':''} ${p.hug?'<span class="pill pink">ハグ済み</span>':''}</div>
+ <div class="relrow"><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','line')">💬 LINE ${g.people[k].unread?'<span class="unread">未読</span>':''}</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','study')">📚 勉強</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','lunch')">🍱 昼飯</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','return')">🚶 帰り道</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','date')">🎡 遊ぶ</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','talk')">🗣 相談</button><button class="relbtn" ${cooldown?'disabled':''} onclick="relAction('${k}','gift')">🎁 プレゼント</button><button class="relbtn" onclick="apologize('${k}')">🙏 謝る</button><button class="relbtn" onclick="distance('${k}')">↔ 距離を置く</button></div>
+ </div>`
+}).join("");
+$("calendarGrid").innerHTML=monthNames.map((m,mi)=>{ let start=mi===0?0:months.slice(0,mi).reduce((a,b)=>a+b,0); let end=start+months[mi]-1; let events=[]; if(mi===9) events.push("共テ直前"); if(mi===10) events.push("共通テスト・出願"); if(mi===11) events.push("早稲田入試"); let active=g.day>=start&&g.day<=end; return `<div class="monthCard ${active?"active":""}"><b>${m}</b><span>${start+1}〜${end+1}日</span>${events.map(e=>`<small>${e}</small>`).join("")}</div>`; }).join("");
+$("log").innerHTML=g.logs.map(l=>`<div class="event ${l.c}"><span class="muted">${l.t}</span><br>${l.x}</div>`).join("");
+}
+function examText(){
+let avg=(g.eng+g.jpn+g.world+g.writing)/4;
+let grade=avg>=78?"A":avg>=68?"B":avg>=58?"C":avg>=48?"D":"E";
+return `<div style="font-size:42px;font-weight:800">${grade}判定</div><p>総合力 ${avg.toFixed(1)}</p>
+<div class="muted">早稲田 商学部 / 文化構想</div><div class="progress">本番想定：${g.day<250?"まだ伸ばせる":"実戦力が重要な時期"}</div>`;
+}
+function goalText(){
+let d=dateObj();let goals=g.day<90?["英単語を固める","世界史通史を一周","古文単語を継続"]:g.day<210?["早稲田レベル演習","過去問研究","弱点補強"]:["過去問演習","答案の精度","睡眠と体調管理"];
+return `<b>${goals[g.day%goals.length]}</b><p class="muted">行動によってステータスと人間関係が変化します。</p>`;
+}
+function showTab(id,b){["status","people","calendar","world","history"].forEach(x=>$(x).style.display=x===id?"block":"none");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));b.classList.add("on")}
+
+function study(type){
+if(g.energy<18){addLog("今日はもう集中力が残っていない。休むべきだ。","bad");render();return}
+let gain= type==="all"?2.2:4.2;
+let cost=type==="all"?28:17;
+if(type==="all"){g.eng+=gain;g.jpn+=gain;g.world+=gain;g.writing+=1.2}
+else g[type]+=gain;
+g[type==="all"?"eng":type]=type==="all"?g.eng:clamp(g[type]);
+g.energy-=cost;g.health-=type==="all"?4:2;g.totalStudy+=type==="all"?5:2.5;g.streak++;
+addLog(type==="all"?"3科目の実戦演習をやり切った。":`${{eng:"英語",jpn:"国語",world:"世界史"}[type]}を集中して勉強した。`,"good");
+randomEvent();advance();
+}
+function rest(){g.energy=95;g.health=clamp(g.health+9);g.mental=clamp(g.mental+8);g.streak=0;addLog("今日は休養日。明日に備えて回復した。");advance()}
+function social(){
+ let keys=Object.keys(g.people);let k=keys[Math.floor(Math.random()*keys.length)];relAction(k,'meet',true)
+}
+function relationLabel(p){
+ if(p.state==='恋人' && p.close>=80) return '💗 深い恋人関係';
+ if(p.aff>=80 && p.trust>=70) return p.state==='恋人'?'💗 恋人':'✨ 特別な存在';
+ if(p.aff>=65 && p.trust>=55) return '💛 親しい';
+ if(p.aff>=50 && p.trust>=45) return '🙂 仲がいい';
+ if(p.trust>=65) return '🤝 信頼できる友人';
+ return p.state;
+}
+function relAction(k,action,fromSocial=false){
+ let p=g.people[k];
+ if(!fromSocial && g.day-p.last<3){addLog(`${p.name}とは少し間を空けた方がよさそうだ。`,'bad');render();return}
+ if(g.energy<8){addLog('今日はもう人と関わる余力がない。','bad');render();return}
+ let effects={line:[3,2,4,1],study:[4,5,6,0],meet:[7,4,10,5],talk:[4,9,7,2]}[action];
+ let names={line:'LINE',study:'一緒に勉強',meet:'二人で会う',talk:'悩み相談'};
+ let [a,t,c,m]=effects;
+ if(k==='tetsu' && action==='study'){a=2;t=1;c=1;m=3}
+ if(k==='keio' && action==='meet'){a+=2;c+=2}
+ p.aff=clamp(p.aff+a);p.trust=clamp(p.trust+t);p.close=clamp(p.close+c);p.mood=clamp(p.mood+m);p.last=g.day;
+ g.energy-=action==='meet'?20:action==='study'?14:10;g.mental=clamp(g.mental+(action==='talk'?7:action==='meet'?5:2));
+ updateRelationship(k);
+ let text=relationshipText(k,action);
+ addLog(text, action==='talk'||p.state==='恋人'?'special':'good');
+ if(relationshipUnlock(k)) return;
+ advance();
+}
+function updateRelationship(k){
+ let p=g.people[k];
+ if(isRomance(k) && p.aff>=82 && p.trust>=75 && p.close>=80){p.state='恋人';p.type='恋人'}
+ else if(isRomance(k) && p.aff>=70 && p.trust>=60){p.state='好意'}
+ else if(p.aff>=75 && p.trust>=65)p.state='親友';
+ else if(p.aff>=60 && p.trust>=50)p.state='親しい';
+ else if(p.aff>=50 || p.trust>=50)p.state='仲がいい';
+ else if(p.aff>0 || p.trust>0)p.state='顔見知り';
+}
+function relationshipUnlock(k){
+ let p=g.people[k];
+ if(k==='rinka' && p.aff>=82 && p.trust>=75 && p.close>=80 && p.state==='恋人' && !p.deep){
+  p.deep=true;
+  openModal(`${p.name}との特別イベント`,`${p.name}「受験も大事だけど、無理しすぎないでね。今日は少しだけ一緒にいたい」`,[
+   {t:'一緒にゆっくり過ごす',f:()=>{p.close=clamp(p.close+6);p.trust=clamp(p.trust+4);addLog('りんかとの距離が一段と近づいた。','special');advance()}},
+   {t:'勉強を優先する',f:()=>{p.trust=clamp(p.trust+3);g.mental=clamp(g.mental+2);addLog('りんかは少し寂しそうだったが、応援してくれた。','special');advance()}}
+  ]);return true;
+ }
+ if(k==='keio' && p.aff>=78 && p.trust>=65 && p.close>=65 && !p.special){
+  p.special=true;openModal('クラスメイトとの分岐',`${p.name}「最近、話してるとなんか落ち着くんだよね」`,[
+   {t:'素直に嬉しいと伝える',f:()=>{p.aff=clamp(p.aff+5);p.close=clamp(p.close+5);addLog('クラスメイトとの関係が特別な段階に進んだ。','special');advance()}},
+   {t:'受験を優先すると伝える',f:()=>{p.trust=clamp(p.trust+5);addLog('距離感を保ちながら、お互い受験を頑張ることにした。','good');advance()}}
+  ]);return true;
+ }
+ return false;
+}
+function relationshipText(k,a){
+ let p=g.people[k];
+ let base={line:'連絡を取った。',study:'一緒に勉強した。',meet:'二人で会った。',talk:'悩みを聞いた。'}[a];
+ if(k==='tetsu') base=a==='study'?'てつと模試や勉強量について話した。':'てつと話した。良い刺激になった。';
+ if(k==='rinka' && a==='line') base='りんかとLINEした。受験のことや日常の話で少し距離が縮まった。';
+ if(k==='mokujyo' && a==='talk') base='もくじょに弱音を話した。気持ちが少し軽くなった。';
+ return `${p.name}と${base}`;
+}
+function partTime(){g.money+=6500;g.energy-=35;g.mental=clamp(g.mental-2);g.totalStudy+=0;addLog("バイトで¥6,500稼いだ。勉強時間は削られた。");advance()}
+function simulateDay(){g.energy=clamp(g.energy+15);g.health=clamp(g.health-1);g.mental=clamp(g.mental-1);addLog("特別な行動をせず1日を終えた。");randomEvent();if(!choiceEvent())advance()}
+function advance(){
+Object.values(g.people).forEach(p=>{p.mood=clamp(p.mood+(Math.random()<.5?-2:2));});
+g.day++;
+if(g.day>=365){finish();return}
+if(g.day%7===0){g.money-=3500;addLog("週の生活費として¥3,500使った。");}
+if(g.day%30===0){g.eng+=1;g.jpn+=1;g.world+=1;addLog("1か月の継続効果で基礎力が少し伸びた。","good")}
+render()
+}
+function randomEvent(){
+let r=Math.random();
+if(r<.10){g.people.tetsu.aff=clamp(g.people.tetsu.aff+3);addLog("てつが模試の結果を見せてきた。負けたくない。","special")}
+else if(r<.18){g.mental=clamp(g.mental-7);addLog("SNSを見すぎて時間を失った。メンタルも少し下がった。","bad")}
+else if(r<.24){g.eng+=2;addLog("予備校の先生から英語の勉強法を教わった。","good")}
+else if(r<.29){g.money-=2500;addLog("参考書を購入した。¥2,500。")}
+else if(r<.33){let ks=Object.keys(g.people);let k=ks[Math.floor(Math.random()*ks.length)];g.people[k].aff=clamp(g.people[k].aff+8);g.people[k].trust=clamp(g.people[k].trust+4);addLog(`${g.people[k].name}から嬉しい連絡が来た。関係が進展した。`,"special")}
+}
+function finish(){
+let avg=(g.eng+g.jpn+g.world+g.writing)/4;
+let pass=avg>=73 && g.mental>=35;
+openModal("1年間の浪人生活、終了",pass?`早稲田に合格した。総合力 ${avg.toFixed(1)}。この1年の積み重ねが結果になった。`:`早稲田は不合格だった。総合力 ${avg.toFixed(1)}。ただし、この1年で積み上げたものは残っている。`,[{t:"もう一度プレイ",f:()=>resetGame()}])
+}
+function openModal(title,text,opts){$("modalTitle").textContent=title;$("modalText").textContent=text;$("choices").innerHTML=opts.map((o,i)=>`<button class="choice" id="c${i}">${o.t}</button>`).join("");opts.forEach((o,i)=>$("c"+i).onclick=()=>{closeModal();o.f()});$("modal").classList.add("show")}
+function closeModal(){$("modal").classList.remove("show")}
+function saveGame(){localStorage.setItem("wasedaRun",JSON.stringify(g));addLog("ゲームを保存した。","good");render()}
+function loadGame(){let x=localStorage.getItem("wasedaRun");if(x){g=JSON.parse(x);ensureV3();addLog("保存データを読み込んだ。","good");render()}else{addLog("保存データがありません。","bad");render()}}
+function resetGame(){if(confirm("最初からやり直しますか？")){g=JSON.parse(JSON.stringify(initial));render()}}
+
+/* ===== V3 systems ===== */
+const places={school:['予備校','自習室と教室'],cafe:['カフェ','勉強・雑談'],park:['公園','帰り道・休憩'],station:['駅','偶然の遭遇'],shop:['本屋','参考書・プレゼント'],hotel:['ホテル','静かな個室で集中して勉強'],home:['自宅','回復・整理']};
+const monthNames=['4月','5月','6月','7月','8月','9月','10月','11月','12月','1月','2月','3月'];
+const monthly=['新年度・新しいクラス','中間模試・友達の輪','梅雨・疲労管理','夏祭り・夏期講習','夏休み・長時間勉強','秋模試・進路の話','文化祭・関係の分岐','早慶模試・焦り','冬期講習・クリスマス','共通テスト直前','共通テスト・出願','早稲田入試・卒業'];
+const personalities={rinka:'距離が近くなるほど寂しさも出る。約束を重視。',mokujyo:'聞き上手。相談されると信頼が上がりやすい。',tetsu:'競争心が強い。勉強で関係が動く。',ryuto:'落ち着いていて付き合いやすい。',yuta:'明るくノリがいい。',yugo:'マイペース。',daisuke:'面倒見がいい。',rasuro:'自然体で人を惹きつける。',takeshi:'ちょっとアホだが憎めない。',rise:'話しやすく距離が縮まりやすい。',yuuri:'慎重だが仲良くなると素直。',mihana:'明るく親しみやすい。',mimoe:'穏やかで話を聞いてくれる。',kurumi:'自由人。誘い方次第で反応が変わる。'};
+function ensureV3(){
+ g.rumors=g.rumors||[]; g.promises=g.promises||[]; g.unreadLines=g.unreadLines||0; g.lineInbox=g.lineInbox||[]; g.npcScores=g.npcScores||{}; g.npcRomances=g.npcRomances||[]; g.history=g.history||{handholds:0,hugs:0,dates:0,lines:0,meetings:0,arguments:0,promisesKept:0,promisesBroken:0,rumors:0}; g.flags=g.flags||{}; g.location=g.location||'school';
+ Object.entries(g.people).forEach(([k,p])=>{p.personality=personalities[k]||'';p.history=p.history||[];p.handhold=!!p.handhold;p.hug=!!p.hug;p.cooldownUntil=p.cooldownUntil||-1;p.unread=!!p.unread;p.lineHistory=p.lineHistory||[]});
+}
+ensureV3();
+function pushHistory(k,action,result){g.people[k].history.push({day:g.day,action,result});if(g.people[k].history.length>30)g.people[k].history.shift()}
+function addRumor(text,source){g.rumors.unshift({day:g.day,text,source});if(g.rumors.length>12)g.rumors.pop();g.history.rumors++}
+function addPromise(k,day,type){g.promises.push({k,day,type,done:false});addLog(`${g.people[k].name}と「${type}」の約束をした。`,'special')}
+function checkPromises(){
+ g.promises.forEach(pr=>{if(!pr.done&&pr.day===g.day){pr.due=true;openPromise(pr)}})
+ const overdue=g.promises.filter(pr=>!pr.done&&!pr.due&&pr.day<g.day); overdue.forEach(pr=>{pr.done=true;g.people[pr.k].trust=clamp(g.people[pr.k].trust-7);g.history.promisesBroken++;addLog(`${g.people[pr.k].name}との約束を守れなかった。信頼が下がった。`,'bad')});
+}
+function openPromise(pr){const p=g.people[pr.k];openModal('約束の日',`${p.name}「今日、約束してたよね。どうする？」`,[{t:'約束を守る',f:()=>{pr.done=true;g.history.promisesKept++;p.trust=clamp(p.trust+7);p.close=clamp(p.close+4);addLog(`${p.name}との約束を守った。`,'good');advance()}},{t:'受験を優先して断る',f:()=>{pr.done=true;g.history.promisesBroken++;p.trust=clamp(p.trust-4);g.mental=clamp(g.mental+2);addLog(`${p.name}との約束を断った。受験を優先した。`,'bad');advance()}}])}
+function lineChat(k){
+ const p=g.people[k];g.history.lines++;p.last=g.day;p.mood=clamp(p.mood+2);g.energy-=8;p.unread=0;g.unreadLines=Math.max(0,(g.unreadLines||0)-1);
+ const qs={
+  rinka:[['今日どうだった？','普通だったよ。でもちょっと疲れたかも。'],['無理すんなよ','ありがとう。そう言ってくれると安心する。'],['今度一緒に勉強しよ','うん、約束。']],
+  mokujyo:[['最近どう？','まあまあ。そっちは？'],['ちょっと相談がある','もちろん。聞くよ。'],['今度飯いこ','いいね、行こう。']],
+  tetsu:[['最近勉強してる？','当然。お前には負けない。'],['模試どうだった？','次はもっと上げる。'],['一緒に演習する？','それなら勝負な。']]
+ }[k]||[['最近どう？','まあまあかな。そっちは？'],['また話そ','うん、いいよ。'],['今度一緒に勉強しよ','予定が合えば一緒にやろう。']];
+ let preview=`${p.name}とのLINE\n\n${p.name}「${qs[0][1]}」\n\n返信を選ぶ`;
+ openModal('LINE',preview,qs.map((q,i)=>({t:q[0],f:()=>{
+   p.aff=clamp(p.aff+[3,4,5][i]);p.trust=clamp(p.trust+[1,2,3][i]);p.close=clamp(p.close+[2,4,5][i]);
+   p.lineHistory=p.lineHistory||[];p.lineHistory.push({day:g.day,me:q[0],npc:q[1]});if(p.lineHistory.length>20)p.lineHistory.shift();
+   pushHistory(k,'LINE',q[0]);addLog(`${p.name}とLINEした。「${q[0]}」`,'good');
+   if(i===2&&g.day+7<365)addPromise(k,g.day+7,'一緒に会う');updateRelationship(k);advance();
+ }})));
+}
+function physicalEvent(k){
+ const p=g.people[k];
+ if(!isRomance(k) || p.state!=='恋人') return false;
+ if(p.close>=68&&!p.handhold){p.handhold=true;g.history.handholds++;p.close=clamp(p.close+6);p.trust=clamp(p.trust+4);addLog(`${p.name}と帰り道、自然に手をつないだ。`,'special');return true}
+ if(p.close>=82&&p.handhold&&!p.hug){p.hug=true;g.history.hugs++;p.close=clamp(p.close+7);p.trust=clamp(p.trust+5);addLog(`${p.name}と別れ際、短くハグをした。距離がまた一段近づいた。`,'special');return true}
+ return false;
+}
+function relationStage(p){if(p.state==='セフレ')return 'セフレ';if(p.crossed)return '一線を超えた';if(p.state==='恋人'&&p.close>=82)return '深い恋人関係';if(p.state==='恋人')return '恋人';if(p.aff>=80&&p.trust>=70)return '親友';if(p.aff>=70&&p.trust>=60)return '親しい';if(p.aff>=55)return '仲がいい';return p.state}
+function relActionV3(k,action){ if(action==='meet') action='date';
+ const p=g.people[k];if(g.day-p.last<2){addLog(`${p.name}とは少し間を空ける方がよさそう。`,'bad');render();return}
+ const effects={line:[4,2,4,1,8],study:[5,5,6,0,14],lunch:[7,3,8,3,15],return:[6,4,9,4,13],date:[10,5,14,6,25],talk:[5,9,8,3,10],gift:[8,6,7,4,18]}[action]||[0,0,0,0,0];
+ let [a,t,c,m,cost]=effects;if(action==='gift'&&g.money<3000){addLog('プレゼントを買うお金が足りない。','bad');render();return}
+ if(action==='gift')g.money-=3000;
+ p.aff=clamp(p.aff+a);p.trust=clamp(p.trust+t);p.close=clamp(p.close+c);p.mood=clamp(p.mood+m);p.last=g.day;g.energy-=cost;g.mental=clamp(g.mental+(action==='talk'?5:action==='date'?3:1));
+ if(action==='line'){lineChat(k);return}
+ if(action==='date'){g.history.dates++;if(g.day+7<365)addPromise(k,g.day+7,'次の遊び');}
+ if(action==='return')physicalEvent(k);
+ updateRelationship(k);pushHistory(k,action,'交流');
+ if(Math.random()<.18&&action!=='talk'){addRumor(`${p.name}と最近よく一緒にいるらしい。`,'予備校');addLog(`噂が広がった。「${p.name}と最近よく一緒にいるらしい」`,'special')}
+ if(isRomance(k)&&p.state==='恋人'&&p.close>=68)physicalEvent(k);
+ // 成人同士の恋愛分岐。露骨な描写はせず、関係性だけを記録する。
+ if(isRomance(k)&&p.aff>=75&&p.trust>=55&&p.close>=80&&!p.relationshipChoice){
+   p.relationshipChoice=true;
+   openModal(`${p.name}との関係`,`${p.name}との距離がかなり近くなった。二人の関係をどうする？`,[
+    {t:'恋人として向き合う',f:()=>{p.state='恋人';p.type='恋人';p.aff=clamp(p.aff+5);p.trust=clamp(p.trust+5);p.close=clamp(p.close+3);addLog(`${p.name}と恋人になった。`,'special');advance()}},
+    {t:'割り切った関係にする',f:()=>{p.state='セフレ';p.type='セフレ';p.trust=clamp(p.trust-5);p.close=clamp(p.close+8);addLog(`${p.name}とは恋人ではなく、セフレという関係になった。`,'special');advance()}},
+    {t:'今は決めない',f:()=>{p.relationshipChoice=false;addLog(`${p.name}との関係は今のままにした。`);advance()}}
+   ]);return;
+ }
+ if(isRomance(k)&&p.state==='恋人'&&p.close>=90&&!p.crossed){
+   p.crossed=true;
+   openModal(`${p.name}との特別イベント`,`${p.name}との関係がさらに深まり、一線を超えるかどうかの場面になった。`,[
+    {t:'一線を超える',f:()=>{p.close=clamp(p.close+6);p.trust=clamp(p.trust+6);p.state='恋人';g.history.deepRelations=(g.history.deepRelations||0)+1;addLog(`${p.name}と一線を超えた。二人の関係はさらに深まった。`,'special');advance()}},
+    {t:'まだ超えない',f:()=>{p.crossed=false;addLog(`${p.name}とは、まだ一線を超えないことにした。`,'special');advance()}}
+   ]);return;
+ }
+ if(isRomance(k)&&p.state==='セフレ'&&p.close>=88&&!p.crossed){
+   p.crossed=true;
+   openModal(`${p.name}との関係`,`${p.name}とは恋人ではないが、二人の距離はかなり近い。`,[
+    {t:'この関係を続ける',f:()=>{p.close=clamp(p.close+5);g.history.deepRelations=(g.history.deepRelations||0)+1;addLog(`${p.name}とのセフレ関係が続いている。`,'special');advance()}},
+    {t:'関係を終わらせる',f:()=>{p.state='仲がいい';p.type='恋愛候補';p.close=clamp(p.close-10);addLog(`${p.name}とのセフレ関係を終わらせた。`);advance()}}
+   ]);return;
+ }
+ if(isRomance(k)&&p.aff>=75&&p.trust>=65&&!g.flags[k+'Confession']){g.flags[k+'Confession']=true;openModal('クラスメイトとの分岐',`${p.name}「最近、あなたと話す時間、けっこう好きかも」`,[{t:'素直に嬉しい',f:()=>{p.aff=clamp(p.aff+6);p.close=clamp(p.close+5);addLog('クラスメイトとの距離が特別な段階へ。','special');advance()}},{t:'今は受験に集中する',f:()=>{p.trust=clamp(p.trust+6);addLog('お互い受験を優先することにした。','good');advance()}}]);return}
+ advance();
+}
+function apologize(k){const p=g.people[k];p.trust=clamp(p.trust+6);p.mood=clamp(p.mood+8);p.last=g.day;g.history.arguments=Math.max(0,g.history.arguments-1);addLog(`${p.name}にちゃんと謝った。少し空気が戻った。`,'good');g.energy-=5;advance()}
+function distance(k){const p=g.people[k];p.close=clamp(p.close-8);p.aff=clamp(p.aff-3);p.mood=clamp(p.mood-3);addLog(`${p.name}とは少し距離を置くことにした。`);advance()}
+function renderWorld(){
+ ensureV3();$('map').innerHTML=Object.entries(places).map(([k,v])=>`<button class="loc" onclick="travel('${k}')">📍 ${v[0]}<small>${v[1]}</small></button>`).join('');
+ $('rumors').innerHTML=g.rumors.length?g.rumors.slice(0,5).map(r=>`<div>・${r.text} <span class="muted">(${r.day+1}日目)</span></div>`).join(''):'<span class="muted">まだ噂はない。</span>';
+ $('promises').innerHTML=g.promises.filter(p=>!p.done).slice(0,5).map(p=>`<div>・${g.people[p.k].name}：${p.type} / ${p.day+1}日目</div>`).join('')||'<span class="muted">予定なし。</span>';
+}
+function travel(k){g.location=k;g.energy-=3;addLog(`${places[k][0]}へ移動した。`);if(k==='hotel'){g.money-=4500;g.energy=clamp(g.energy-5);g.totalStudy+=3;g.eng+=1.5;g.jpn+=1;g.world+=1.5;g.writing+=1;addLog('ホテルの静かな部屋で集中して勉強した。利用料¥4,500。','good')}if(Math.random()<.28){const keys=Object.keys(g.people).filter(x=>x!== 'tetsu');const who=keys[Math.floor(Math.random()*keys.length)];g.people[who].mood=clamp(g.people[who].mood+3);addLog(`${places[k][0]}で${g.people[who].name}と偶然会った。`,'special')}renderWorld();render()}
+function npcRomanceTick(){
+ const female=["rinka","rise","yuuri","mihana","mimoe","kurumi"].filter(k=>g.people[k]);
+ const male=["ryuto","yuta","yugo","daisuke","rasuro","takeshi"].filter(k=>g.people[k]);
+ if(!g.npcRomances.length && g.day>35 && Math.random()<0.08 && female.length && male.length){
+   const f=female[Math.floor(Math.random()*female.length)], m=male[Math.floor(Math.random()*male.length)];
+   g.npcRomances.push({a:f,b:m,stage:"気になる",score:35,last:g.day});
+   addRumor(`${g.people[f].name}と${g.people[m].name}、最近よく話しているらしい。`,'人間関係');
+   addLog(`${g.people[f].name}と${g.people[m].name}の間に新しい関係が生まれた。`,'special');
+ }
+ g.npcRomances.forEach(r=>{
+   if(g.day-r.last<5)return;
+   r.last=g.day;
+   r.score+=Math.floor(Math.random()*9)-2;
+   if(r.score>=65&&r.stage==='気になる'){
+     r.stage='仲がいい';
+     addRumor(`${g.people[r.a].name}と${g.people[r.b].name}がかなり仲良くなっている。`,'人間関係');
+   }
+   if(r.score>=85&&r.stage==='仲がいい'){
+     r.stage='付き合い始めた';
+     addLog(`${g.people[r.a].name}と${g.people[r.b].name}が付き合い始めたらしい。`,'special');
+   }
+   if(r.score<20&&r.stage!=='気になる'){
+     r.stage='距離ができた';
+     addRumor(`${g.people[r.a].name}と${g.people[r.b].name}、最近は少し距離があるみたい。`,'人間関係');
+   }
+ });
+}
+function renderNpcRomances(){
+ ensureV3();
+ const box=document.getElementById('history');
+ if(!box)return;
+ let card=document.getElementById('npcRomanceBox');
+ if(!card){
+   card=document.createElement('div');card.id='npcRomanceBox';card.className='eventcard';
+   card.innerHTML='<b>NPCの人間関係</b><div id="npcRomanceList"></div>';
+   box.appendChild(card);
+ }
+ document.getElementById('npcRomanceList').innerHTML=g.npcRomances.length?g.npcRomances.map(r=>`<div class="npcrom">${g.people[r.a].name} × ${g.people[r.b].name} — <b>${r.stage}</b></div>`).join(''):'<span class="muted">まだ大きな変化はない。</span>';
+}
+function autonomousWorld(){
+ const ps=Object.entries(g.people);ps.forEach(([k,p])=>{if(Math.random()<.35){p.mood=clamp(p.mood+(Math.random()<.5?-3:3));p.last=Math.max(p.last,g.day-10)}});
+ if(Math.random()<.10){const keys=Object.keys(g.people);const a=keys[Math.floor(Math.random()*keys.length)],b=keys[Math.floor(Math.random()*keys.length)];if(a!==b){g.people[a].mood=clamp(g.people[a].mood-3);addRumor(`${g.people[a].name}と${g.people[b].name}が何か話していた。`,'人間関係');}}
+ if(Math.random()<.16&&g.day>20){
+   g.npcScores.tetsu=(g.npcScores.tetsu||55)+1+Math.random()*2.5;
+   g.people.tetsu.aff=clamp(g.people.tetsu.aff+2);
+   if(Math.random()<.45) addLog('てつが勝手に勉強量を伸ばしている。ライバルとの差が動いた。','special');
+ }
+ npcRomanceTick();
+}
+function monthlyEvent(){if(g.day%30!==0)return;const mi=Math.floor(g.day/30);if(mi<monthly.length){addLog(`月間イベント：${monthly[mi]}`,'special');if(mi===3){g.mental=clamp(g.mental+5);addLog('夏祭りの誘いが増えた。','special')}if(mi===6){let ks=[...romanceCandidates];let k=ks[Math.floor(Math.random()*ks.length)];g.people[k].mood=clamp(g.people[k].mood+8);g.people.mokujyo.aff=clamp(g.people.mokujyo.aff+4)}}}
+function renderMonthEvents(){$('monthEvents').innerHTML=monthly.map((x,i)=>`<div class="month"><b>${monthNames[i]}</b><br>${x}</div>`).join('')}
+function npcBaseScore(k){
+ ensureV3();
+ if(g.npcScores[k]==null){const seed=[...k].reduce((a,c)=>a+c.charCodeAt(0),0);g.npcScores[k]=42+(seed%31);}
+ return g.npcScores[k];
+}
+function rankingText(){
+ const names=Object.entries(g.people).map(([k,p])=>({k,name:p.name,score:Math.round(npcBaseScore(k)+p.aff*.18+p.trust*.08)}));
+ const meScore=Math.round((g.eng+g.jpn+g.world+g.writing)/4+g.totalStudy*.035);
+ names.push({k:'me',name:'あなた',score:meScore});
+ names.sort((a,b)=>b.score-a.score);
+ const rank=names.findIndex(x=>x.k==='me')+1;
+ return `<div class="muted" style="margin-bottom:4px">総合力＋勉強量から算出</div><div class="rankrow rankme"><span>${rank}位　あなた</span><b>${meScore}</b></div>`+
+ names.filter(x=>x.k!=='me').slice(0,5).map((x,i)=>`<div class="rankrow"><span>${names.findIndex(y=>y.k===x.k)+1}位　${x.name}</span><b>${x.score}</b></div>`).join('')+`<div class="muted" style="margin-top:5px">クラス内 ${rank}/${names.length}位</div>`;
+}
+function maybeIncomingLine(){
+ const keys=Object.keys(g.people).filter(k=>g.people[k].state!=='未交流'||g.people[k].aff>=15);
+ if(!keys.length||Math.random()>=.12)return;
+ const k=keys[Math.floor(Math.random()*keys.length)],p=g.people[k];
+ p.unread=true;g.unreadLines=(g.unreadLines||0)+1;
+ const msgs=['今ちょっと話せる？','今日どうだった？','また一緒に勉強しよ','最近忙しそうだね','今度どこか行かない？'];
+ const msg=msgs[Math.floor(Math.random()*msgs.length)];
+ g.lineInbox=g.lineInbox||[];g.lineInbox.unshift({day:g.day,k,text:msg});if(g.lineInbox.length>20)g.lineInbox.pop();
+ addLog(`${p.name}からLINEが来た。「${msg}」`,'special');
+}
+function choiceEvent(){
+ if(Math.random()>=.10)return;
+ const events=[
+  {title:'自習室での誘い',text:'勉強中、仲のいい相手から「今日は一緒に帰らない？」と誘われた。',opts:[
+   ['一緒に帰る',()=>{g.energy-=8;g.mental=clamp(g.mental+4);addLog('一緒に帰って気分転換した。','good')}],
+   ['自習を続ける',()=>{g.totalStudy+=1.5;g.eng+=.7;g.mental=clamp(g.mental-2);addLog('誘いを断って自習を続けた。','good')}]]},
+  {title:'模試前の誘惑',text:'前日に友達から遊びに誘われた。',opts:[
+   ['遊ぶ',()=>{g.mental=clamp(g.mental+7);g.streak=Math.max(0,g.streak-1);addLog('模試前に遊んでリフレッシュした。')}],
+   ['断る',()=>{g.eng+=1;g.jpn+=.5;g.streak++;addLog('模試を優先して断った。','good')}]]},
+  {title:'SNSで見た結果',text:'友達が模試の好成績をSNSに載せていた。',opts:[
+   ['悔しい。勉強する',()=>{g.mental=clamp(g.mental+2);g.world+=1.2;g.streak++;addLog('刺激を受けて世界史を追加で勉強した。','good')}],
+   ['気にしない',()=>{g.mental=clamp(g.mental+1);addLog('人と比べず自分のペースを守った。')}]]}
+ ];
+ const e=events[Math.floor(Math.random()*events.length)];
+ openModal(e.title,e.text,e.opts.map(([t,f])=>({t,f:()=>{f();advance()}})));return true;
+}
+function renderHistory(){let avg=(g.eng+g.jpn+g.world+g.writing)/4;$('summary').innerHTML=`<div>総勉強時間<br><b>${Math.floor(g.totalStudy)}h</b></div><div>最高判定<br><b>${avg>=78?'A':avg>=68?'B':avg>=58?'C':avg>=48?'D':'E'}</b></div><div>手をつないだ回数<br><b>${g.history.handholds}</b></div><div>ハグ<br><b>${g.history.hugs}</b></div><div>デート・遊び<br><b>${g.history.dates}</b></div><div>約束を守った<br><b>${g.history.promisesKept}</b></div><div>約束を破った<br><b>${g.history.promisesBroken}</b></div><div>噂が生まれた<br><b>${g.history.rumors}</b></div><div>一線を超えた関係<br><b>${g.history.deepRelations||0}</b></div>`;$('milestones').innerHTML=g.logs.filter(x=>x.c==='special').slice(0,14).map(x=>`<div>・<span class="muted">${x.t}</span> ${x.x}</div>`).join('')}
+// Override render to include V3 panels while retaining the original UI.
+const oldRender=render;
+render=function(){oldRender();ensureV3();renderWorld();renderMonthEvents();renderHistory();renderNpcRomances();Object.entries(g.people).forEach(([k,p])=>{p.state=relationStage(p)});};
+const oldRelAction=relAction;relAction=function(k,a,fromSocial=false){if(fromSocial){return relActionV3(k,'meet')}return relActionV3(k,a)};
+const oldAdvance=advance;
+advance=function(){autonomousWorld();monthlyEvent();oldAdvance();maybeIncomingLine();checkPromises();};
+
+/* ===== FAST FORWARD ===== */
+function skipDays(n){
+  ensureV3();
+  if(g.day>=364){finish();return;}
+  const start=g.day;
+  let stopped=false, reason='';
+  for(let i=0;i<n && g.day<364;i++){
+    // Simulate one ordinary day without rendering after every step.
+    autonomousWorld();
+    g.energy=clamp(g.energy+15);
+    g.health=clamp(g.health-1);
+    g.mental=clamp(g.mental-1);
+    if(Math.random()<0.24) randomEvent();
+    g.day++;
+    if(g.day%7===0){g.money-=3500;addLog('週の生活費として¥3,500使った。');}
+    if(g.day%30===0){g.eng+=1;g.jpn+=1;g.world+=1;addLog('1か月の継続効果で基礎力が少し伸びた。','good');monthlyEvent();}
+    // Promises and important relationship events interrupt the skip.
+    const due=g.promises.find(pr=>!pr.done&&pr.day===g.day);
+    if(due){stopped=true;reason='約束の日';break;}
+    // Stop at major exam days.
+    if([305,315,325,335].includes(g.day)){stopped=true;reason='大型イベント';break;}
+  }
+  const moved=g.day-start;
+  addLog(`${moved}日間を高速シミュレーションした。${stopped?'重要イベントで停止。':''}`,'special');
+  render();
+  if(g.day>=364){finish();return;}
+  const due=g.promises.find(pr=>!pr.done&&pr.day===g.day);
+  if(due){checkPromises();return;}
+  if(stopped){
+    if([305,315,325,335].includes(g.day)){
+      openModal('大型イベント', `${dateStr()}です。重要なイベントが発生します。`, [
+        {t:'確認して進む',f:()=>{randomEvent();render();}},
+        {t:'今日はここで止める',f:()=>{render();}}
+      ]);
+    }
+  }
+}
+function skipToMajor(){
+  const targets=[30,60,90,120,150,180,210,240,270,285,305,315,325,335,364];
+  const next=targets.find(d=>d>g.day);
+  if(!next){finish();return;}
+  skipDays(Math.max(1,next-g.day));
+}
+
+
+/* ===== DEEP SYSTEMS: autonomous NPC lives / delayed consequences / hidden clues / routes ===== */
+const deepDefaults={
+  npc:{}, npcLinks:[], delayed:[], clues:[], route:{study:0,social:0,romance:0,work:0,recovery:0,lonely:0}, achievements:[], examHistory:[], decisions:[], worldSeed:Math.floor(Math.random()*999999)
+};
+function ensureDeep(){
+  Object.keys(deepDefaults).forEach(k=>{if(g[k]==null) g[k]=JSON.parse(JSON.stringify(deepDefaults[k]))});
+  const target={rinka:'早稲田',mokujyo:'同志社',tetsu:'慶應',ryuto:'関西学院',yuta:'関西学院',yugo:'立命館',daisuke:'大阪公立',rasuro:'早稲田',takeshi:'関大',rise:'慶應',yuuri:'早稲田',mihana:'上智',mimoe:'関西学院',kurumi:'立命館'};
+  Object.entries(g.people).forEach(([k,p],i)=>{
+    if(!g.npc[k]) g.npc[k]={study:35+(i*7)%45,stress:25+(i*11)%35,energy:70,goal:55+(i*5)%40,target:target[k]||'関関同立',career:'受験継続',daysActive:0,route:'未定'};
+  });
+  if(!g.npcLinks.length){
+    const ids=Object.keys(g.people); for(let i=0;i<ids.length;i++) for(let j=i+1;j<ids.length;j++) if((i*7+j*3)%9===0) g.npcLinks.push({a:ids[i],b:ids[j],score:20+(i+j)%35,kind:'友人',last:g.day});
+  }
+}
+function scheduleDeep(text,days,fn){g.delayed.push({due:g.day+days,text,done:false,fn});}
+function addClue(text,weight=1){g.clues.unshift({day:g.day,text,weight,seen:false});if(g.clues.length>18)g.clues.pop()}
+function routeTick(){
+  const r=g.route;
+  if(g.totalStudy>=120)r.study++;
+  if(Object.values(g.people).filter(p=>p.aff>=55).length>=3)r.social++;
+  if(Object.values(g.people).some(p=>p.state==='恋人'))r.romance++;
+  if(g.totalStudy<70 && g.money>110000)r.work++;
+  if(g.health>=80&&g.mental>=75)r.recovery++;
+  if(Object.values(g.people).every(p=>p.aff<20))r.lonely++;
+}
+function npcDeepTick(){
+  ensureDeep();
+  Object.entries(g.npc).forEach(([k,n],i)=>{
+    const p=g.people[k]; const effort=(p.mood>60?1:0)+(i%3===0?1:0);
+    n.energy=clamp(n.energy-(2+Math.random()*3));
+    n.stress=clamp(n.stress+(n.energy<30?3:Math.random()<.4?-2:1));
+    if(n.energy>25 && n.stress<78){n.study=clamp(n.study+0.35+effort*.18);n.goal=clamp(n.goal+(Math.random()<.15?.7:0));}
+    else n.study=clamp(n.study-0.15);
+    if(n.stress>88&&n.career==='受験継続'){n.career='休養中';addClue(`${p.name}がかなり疲れているらしい。`,2);}
+    if(n.career==='休養中'&&n.stress<60)n.career='受験継続';
+    n.daysActive++;
+    if(n.study>82&&n.target==='早稲田'&&Math.random()<.08){addLog(`${p.name}が早稲田対策をかなり進めている。`,'special');addClue(`${p.name}の勉強量が急に伸びている。`,2)}
+  });
+  g.npcLinks.forEach(link=>{
+    if(g.day-link.last<3)return; link.last=g.day; link.score=clamp(link.score+(Math.random()<.55?1:-1),0,100);
+    const a=g.people[link.a],b=g.people[link.b];
+    if(link.score>=72&&link.kind==='友人'){link.kind='親しい';addClue(`${a.name}と${b.name}がよく一緒にいるらしい。`,2)}
+    if(link.score>=88&&link.kind==='親しい'){link.kind='特別';addLog(`${a.name}と${b.name}の関係がかなり近くなっている。`,'special')}
+    if(link.score<15&&link.kind!=='友人'){link.kind='距離';addClue(`${a.name}と${b.name}の間に少し距離ができたらしい。`,2)}
+  });
+  // Player choices create consequences that arrive later.
+  if(g.totalStudy>80 && !g.flags.deepStudyAdvice){g.flags.deepStudyAdvice=true;scheduleDeep('夏の努力が秋の実戦力として返ってきた。',55,()=>{g.eng=clamp(g.eng+3);g.writing=clamp(g.writing+2);addLog('夏の積み上げが秋の答案力に繋がった。','good')});addClue('夏の勉強量が後半に影響する気配がある。',3)}
+  if(g.route.social>=2 && !g.flags.socialNetwork){g.flags.socialNetwork=true;scheduleDeep('人間関係が思わぬ情報を運んできた。',35,()=>{g.world=clamp(g.world+2);addLog('友人経由で世界史の勉強法を教えてもらった。','good')});}
+  if(g.route.lonely>=3 && !g.flags.lonely){g.flags.lonely=true;scheduleDeep('孤立がメンタルに影響し始めた。',20,()=>{g.mental=clamp(g.mental-7);addLog('人と話さない日が続き、メンタルが少し落ちた。','bad')});}
+  routeTick();
+}
+function processDelayed(){
+  ensureDeep();
+  g.delayed.filter(x=>!x.done&&x.due<=g.day).forEach(x=>{x.done=true;try{x.fn&&eval('('+x.fn+')')()}catch{}addLog(x.text,'special');addClue(x.text,2)});
+}
+function deepDecision(title,text,choices){
+  g.decisions.push({day:g.day,title});
+  openModal(title,text,choices.map((c,i)=>({t:c.t,f:()=>{c.f();g.decisions[g.decisions.length-1].choice=i;routeTick();advance()}})));
+}
+function deepEvent(){
+  if(g.day<25||Math.random()>0.075)return false;
+  const candidates=[];
+  if(g.mental<45)candidates.push({title:'限界のサイン',text:'最近、机に向かっても頭に入らない。誰かに相談するか、一人で立て直すか。',opts:[
+    {t:'誰かに相談する',f:()=>{g.mental=clamp(g.mental+9);g.route.social++;addClue('相談したことで人間関係が変わった。',2)}},
+    {t:'一人で立て直す',f:()=>{g.mental=clamp(g.mental+3);g.route.lonely++;g.totalStudy+=1}}
+  ]});
+  if(g.money<15000)candidates.push({title:'お金が足りない',text:'教材費と生活費が重なった。勉強時間を削って働くか、支出を抑えるか。',opts:[
+    {t:'バイトを増やす',f:()=>{g.money+=12000;g.energy-=18;g.route.work+=2}},
+    {t:'出費を削る',f:()=>{g.money+=4000;g.mental=clamp(g.mental-2)}}
+  ]});
+  if(g.people.rinka&&g.people.rinka.aff>45)candidates.push({title:'関係の分岐点',text:'りんかとの関係が少し変わってきた。受験と人間関係のバランスをどうする？',opts:[
+    {t:'時間を作る',f:()=>{g.people.rinka.close=clamp(g.people.rinka.close+7);g.route.romance+=2;scheduleDeep('あの時作った時間が後から効いてきた。',28,()=>{g.people.rinka.trust=clamp(g.people.rinka.trust+5)})}},
+    {t:'勉強を優先する',f:()=>{g.eng+=1.5;g.people.rinka.trust=clamp(g.people.rinka.trust-1);g.route.study+=2}}
+  ]});
+  if(!candidates.length)return false;
+  const e=candidates[Math.floor(Math.random()*candidates.length)];deepDecision(e.title,e.text,e.opts);return true;
+}
+function deepWorldHtml(){
+  ensureDeep();
+  const npcRank=Object.entries(g.npc).map(([k,n])=>({name:g.people[k].name,score:Math.round(n.study+(100-n.stress)*.22+n.goal*.35),target:n.target,career:n.career})).sort((a,b)=>b.score-a.score).slice(0,7);
+  const links=g.npcLinks.filter(x=>x.kind!=='友人').slice(0,6).map(x=>`${g.people[x.a].name} × ${g.people[x.b].name} — ${x.kind}`).join('<br>')||'まだ大きな変化はない。';
+  const clues=g.clues.slice(0,5).map(x=>`・${x.text}`).join('<br>')||'まだ伏線はない。';
+  return `<b>NPCの現在</b><div style="margin:5px 0">${npcRank.map((x,i)=>`${i+1}. ${x.name}　${x.score}　${x.target}　${x.career}`).join('<br>')}</div><b>NPC同士</b><div style="margin:5px 0">${links}</div><b>まだ見えない情報</b><div style="margin-top:5px">${clues}</div>`;
+}
+function routeHtml(){
+  ensureDeep(); const r=g.route; const vals=[['勉強',r.study],['友情',r.social],['恋愛',r.romance],['仕事',r.work],['回復',r.recovery],['孤独',r.lonely]];
+  const lead=vals.slice().sort((a,b)=>b[1]-a[1])[0];
+  return `<div>現在の傾向：<b>${lead[0]}</b></div>${vals.map(x=>`<div>${x[0]}：${x[1]}</div>`).join('')}<div style="margin-top:6px">重要な選択 ${g.decisions.length}回 / 伏線 ${g.clues.length}個</div>`;
+}
+function deepRender(){ensureDeep();const dw=document.getElementById('deepWorld'),ri=document.getElementById('routeInfo');if(dw)dw.innerHTML=deepWorldHtml();if(ri)ri.innerHTML=routeHtml();}
+const baseAutonomous=autonomousWorld;
+autonomousWorld=function(){baseAutonomous();npcDeepTick();processDelayed();if(!g._deepEventLock&&deepEvent()){g._deepEventLock=true;setTimeout(()=>g._deepEventLock=false,300);}};
+const baseRender=render;
+render=function(){baseRender();deepRender();};
+/* Multi-ending evaluator: same exam result can produce different life outcomes. */
+function finish(){
+  ensureDeep(); let avg=(g.eng+g.jpn+g.world+g.writing)/4;
+  const pass=avg>=73&&g.mental>=35;
+  const r=g.route; let title,desc;
+  if(pass&&r.romance>=3&&r.social>=2) {title='早稲田合格 × 最高の一年';desc='受験も人間関係も両方を投げなかった。';}
+  else if(pass&&r.study>=5&&r.lonely>=3){title='孤高の合格';desc='人間関係を削ってでも勉強を積み上げ、結果を掴んだ。';}
+  else if(pass&&r.work>=3){title='働きながら合格';desc='時間を切り売りしながら、最後まで受験を続けた。';}
+  else if(pass){title='早稲田大学 合格';desc='積み上げが結果になった。';}
+  else if(!pass&&r.social>=4){title='人間関係に救われた一年';desc='合格には届かなかったが、一人では得られなかったものが残った。';}
+  else if(!pass&&r.recovery>=4&&g.mental>=65){title='立て直しの一年';desc='結果よりも、自分を壊さず一年を走り切った。';}
+  else {title='もう一年';desc='届かなかった。ただし、ここからの選択で結果は変えられる。';}
+  openModal('365日目 — '+title,`${desc}\n\n総合力 ${avg.toFixed(1)} / 勉強 ${Math.floor(g.totalStudy)}h / メンタル ${Math.round(g.mental)}`,[{t:'もう一度プレイ',f:()=>resetGame()}]);
+}
+ensureDeep();
+render();
+</script>
+</body>
+</html>
